@@ -9,7 +9,7 @@ class Link_Analyzer_Admin {
     //Se encarga de añadir hooks y acciones necesarias para el funcionamiento de la interfaz
     public function run() {
         add_action('admin_menu', array($this, 'add_admin_menu')); //Cuando WordPress construye el menú, llamará al método "add_admin_menu"
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_styles')); //Para cargar scripts y estilos.
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts')); //Para cargar scripts y estilos.
         add_action('admin_post_link_analyzer_export', array($this, 'export_csv')); //Acción para manejar la exportación de datos a CSV
         
         // Hooks de activación y desactivación
@@ -32,12 +32,17 @@ class Link_Analyzer_Admin {
     }
 
     //Cargar estilos CSS personalizados
-    public function enqueue_styles($hook) {  //hook, identificador de la página actual en administración de WorsPress
+    public function enqueue_scripts($hook) {  //hook, identificador de la página actual en administración de WorsPress
         if ( $hook != 'toplevel_page_link-analyzer' ) {  //Si no corresponde a la página de administración no carga los estilos
             return;
         }
 
         wp_enqueue_style('link-analyzer-styles', LINK_ANALYZER_PLUGIN_URL . 'css/link-analyzer.css', array(), LINK_ANALYZER_VERSION);
+        wp_enqueue_style('datatables-css', 'https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css');
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('datatables-js', 'https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js', array('jquery'), null, true);
+
+        wp_enqueue_script('link-analyzer-init', LINK_ANALYZER_PLUGIN_URL . 'js/link-analyzer-init.js', array('datatables-js'), null, true);
     }
 
     //Renderizar la página de administración del plugin
@@ -118,7 +123,7 @@ class Link_Analyzer_Admin {
                     <input type="hidden" name="action" value="link_analyzer_export">
                     <input type="submit" class="button" value="Exportar a CSV">
                 </form>
-                <table class="widefat fixed" cellspacing="0">
+                <table class="link-analyzer-table widefat fixed" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Enlace</th>
@@ -130,9 +135,24 @@ class Link_Analyzer_Admin {
                     <tbody>
                         <?php foreach ( $filtered_links as $link ) : ?>
                             <tr>
-                                <td><a href="<?php echo esc_url($link['url']); ?>" target="_blank"><?php echo esc_html($link['url']); ?></a></td>
+                                <td>
+                                    <a href="<?php echo esc_url($link['url']); ?>" target="_blank">
+                                        <?php if ($link['type'] === 'Interno') : ?>
+                                            <span class="dashicons dashicons-admin-links link-interno"></span>
+                                        <?php else : ?>
+                                            <span class="dashicons dashicons-external link-externo"></span>
+                                        <?php endif; ?>
+                                        <?php echo esc_html($link['url']); ?>
+                                    </a>
+                                </td>
                                 <td><?php echo esc_html($link['type']); ?></td>
-                                <td><?php echo esc_html($link['rel']); ?></td>
+                                <td>
+                                    <?php if ( $link['rel'] === 'Nofollow') : ?>
+                                        <span class="dashicons dashicons-no link-nofollow"></span> Nofollow
+                                    <?php else : ?>
+                                        <span class="dashicons dashicons-yes link-dofollow"></span> Dofollow
+                                    <?php endif; ?>
+                                </td>
                                 <td><a href="<?php echo get_permalink($link['post_id']); ?>" target="_blank">Página <?php echo esc_html($link['post_id']); ?></a></td>
                             </tr>
                         <?php endforeach; ?>
@@ -142,6 +162,7 @@ class Link_Analyzer_Admin {
                 <p>No se han encontrado enlaces. Haz clic en "Analizar Enlaces" para comenzar.</p>
             <?php endif; ?>
         </div>
+
         <?php
     }
     

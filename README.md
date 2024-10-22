@@ -22,6 +22,7 @@
 - **Exportación a CSV**: Descarga los resultados del análisis en formato CSV para su análisis externo.
 - **Actualización Automática**: Programa análisis diarios automáticos para mantener tus enlaces actualizados.
 - **Estilos Personalizados**: Mejora la apariencia de la interfaz con estilos CSS personalizados.
+- - **Tabla Interactiva**: Usa **DataTables** para añadir funcionalidades como paginación, búsqueda y ordenación.
 
 ## 🚀 Instalación
 
@@ -67,7 +68,42 @@ Una vez activado, encontrarás un nuevo menú llamado **Link Analyzer** en el pa
 
 - Utiliza los filtros para mostrar solo los enlaces de un tipo específico (Interno, Externo) o relación (Dofollow, Nofollow).
 
-### 5. Exportar a CSV
+### 5. Tabla Interactiva con DataTables
+
+El plugin utiliza **DataTables.js** para proporcionar una tabla interactiva con funcionalidades de búsqueda, ordenación y paginación.
+
+#### Cargar Scripts
+
+El archivo `link-analyzer-init.js` es el encargado de inicializar **DataTables** en la tabla de resultados del plugin. Asegúrate de que los archivos JavaScript necesarios se carguen correctamente.
+
+1. **DataTables.js** y **jQuery** se encolan automáticamente en la página de administración del plugin.
+2. El archivo `link-analyzer-init.js` contiene el siguiente código de inicialización:
+
+```javascript
+jQuery(document).ready(function($) {
+    $(".link-analyzer-table").DataTable({
+        "pageLength": 10,
+        "order": [[0, "asc"]],
+        "language": {
+            "search": "Buscar:",
+            "lengthMenu": "Mostrar _MENU_ enlaces por página",
+            "zeroRecords": "No se encontraron resultados",
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ enlaces",
+            "infoEmpty": "No hay enlaces disponibles",
+            "infoFiltered": "(filtrado de _MAX_ enlaces totales)",
+            "paginate": {
+                "first": "Primera",
+                "last": "Última",
+                "next": "Siguiente",
+                "previous": "Anterior"
+            }
+        }
+    });
+});
+```
+
+
+### 6. Exportar a CSV
 
 - Haz clic en el botón **"Exportar a CSV"** para descargar los resultados del análisis en un archivo CSV.
 
