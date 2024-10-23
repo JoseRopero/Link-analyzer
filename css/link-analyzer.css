@@ -49,3 +49,7 @@ table.link-analyzer-table tr:hover {
 .link-dofollow {
     color: #00b294;
 }
+
+#link-analyzer-dashboard h3 {
+    text-align: center;
+}

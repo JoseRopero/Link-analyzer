@@ -352,12 +352,12 @@ class Link_Analyzer_Admin {
                 <h2>Resumen Visual de Enlaces</h2>
                 <p>A continuación se muestra una visualización de los enlaces internos, externos, dofollow y nofollow de tu sitio:</p>
 
-                <div style="width: 50%; float: left;">
+                <div style="width: 35%; float: left; padding-left: 50px">
                     <h3>Enlaces Internos vs Externos</h3>
                     <canvas id="enlacesInternosExternos" width="400" height="200"></canvas>
                 </div>
 
-                <div style="width: 50%; float: right;">
+                <div style="width: 35%; float: right; padding-right: 50px">
                     <h3>Enlaces Dofollow vs Nofollow</h3>
                     <canvas id="enlacesDofollowNofollow" width="400" height="200"></canvas>
                 </div>
