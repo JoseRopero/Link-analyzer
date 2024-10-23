@@ -22,7 +22,8 @@
 - **Exportación a CSV**: Descarga los resultados del análisis en formato CSV para su análisis externo.
 - **Actualización Automática**: Programa análisis diarios automáticos para mantener tus enlaces actualizados.
 - **Estilos Personalizados**: Mejora la apariencia de la interfaz con estilos CSS personalizados.
-- - **Tabla Interactiva**: Usa **DataTables** para añadir funcionalidades como paginación, búsqueda y ordenación.
+-  **Tabla Interactiva**: Usa **DataTables** para añadir funcionalidades como paginación, búsqueda y ordenación.
+-  **Dashboard Visual**: Un resumen visual con gráficas que muestran la distribución de enlaces internos/externos y dofollow/nofollow.
 
 ## 🚀 Instalación
 
@@ -106,6 +107,12 @@ jQuery(document).ready(function($) {
 ### 6. Exportar a CSV
 
 - Haz clic en el botón **"Exportar a CSV"** para descargar los resultados del análisis en un archivo CSV.
+
+### 7. Dashboard Visual
+- Accede a **Dashboard Visual** en el submenú de **Link Analyzer** para visualizar las gráficas que resume los enlaces.
+- Las gráficas incluyen:
+  - **Enlaces Internos vs Externos**: Muestra un gráfico de pastel con la contribución de estos enlaces.
+  - **Enlaces Dofollow vs Nofollow**: Muestra un gráfico de rosquilla con la relación entre enlaces dofollow y nofollow.  
 
 ## 🤝 Contribuciones
 
