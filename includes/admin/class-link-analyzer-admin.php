@@ -29,11 +29,21 @@ class Link_Analyzer_Admin {
             'dashicons-admin-links',        // Icono predeterminado de WordPress
             80                              // Posición en el menú
         );
+    
+        // Añadimos una página extra para el panel de control visual.
+        add_submenu_page( 
+            'link-analyzer',               // $parent_slug: slug de la página principal
+            'Dashboard Visual',            // $page_title: título de la página
+            'Dashboard Visual',            // $menu_title: título que aparecerá en el menú
+            'manage_options',              // $capability: capacidad requerida para acceder
+            'link-analyzer-dashboard',     // $menu_slug: slug único para esta página
+            array($this, 'admin_dashboard_page') // $callback: función que renderiza la página
+        );
     }
-
+    
     //Cargar estilos CSS personalizados
     public function enqueue_scripts($hook) {  //hook, identificador de la página actual en administración de WorsPress
-        if ( $hook != 'toplevel_page_link-analyzer' ) {  //Si no corresponde a la página de administración no carga los estilos
+        if ( $hook != 'toplevel_page_link-analyzer' && $hook != 'link-analyzer_page_link-analyzer-dashboard' ) {  //Si no corresponde a la página de administración no carga los estilos
             return;
         }
 
@@ -43,6 +53,11 @@ class Link_Analyzer_Admin {
         wp_enqueue_script('datatables-js', 'https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js', array('jquery'), null, true);
 
         wp_enqueue_script('link-analyzer-init', LINK_ANALYZER_PLUGIN_URL . 'js/link-analyzer-init.js', array('datatables-js'), null, true);
+
+        // Solo cargamos Chart.js en la página del dashboard visual
+        if ($hook == 'link-analyzer_page_link-analyzer-dashboard') {
+            wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null, true);
+        }
     }
 
     //Renderizar la página de administración del plugin
@@ -315,5 +330,72 @@ class Link_Analyzer_Admin {
 
     public function process_links_cron() {
         $this->process_links();
+    }
+
+    //Método encargado de renderizar el contenido de panel de control visual
+    public function admin_dashboard_page(){
+        // Obtener los datos dinámicos de enlaces
+        $links_data = $this->get_links_data_for_dashboard();
+
+        // Pasar los datos dinámicos a JavaScript
+        wp_localize_script('link-analyzer-init', 'linkAnalyzerData', array(
+            'internos' => $links_data['internos'],
+            'externos' => $links_data['externos'],
+            'dofollow' => $links_data['dofollow'],
+            'nofollow' => $links_data['nofollow'],
+        ));
+
+        ?>
+        <div class="wrap">
+            <h1>Dashboard de Enlaces</h1>
+            <div id="link-analyzer-dashboard">
+                <h2>Resumen Visual de Enlaces</h2>
+                <p>A continuación se muestra una visualización de los enlaces internos, externos, dofollow y nofollow de tu sitio:</p>
+
+                <div style="width: 50%; float: left;">
+                    <h3>Enlaces Internos vs Externos</h3>
+                    <canvas id="enlacesInternosExternos" width="400" height="200"></canvas>
+                </div>
+
+                <div style="width: 50%; float: right;">
+                    <h3>Enlaces Dofollow vs Nofollow</h3>
+                    <canvas id="enlacesDofollowNofollow" width="400" height="200"></canvas>
+                </div>
+
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        <?php
+    }
+
+    // Función para obtener los datos dinámicos para las gráficas
+    private function get_links_data_for_dashboard() {
+        $links = get_transient('link_analyzer_links');
+        if (false === $links) {
+            $links = get_option('link_analyzer_links', array());
+        }
+
+        $internos = $externos = $dofollow = $nofollow = 0;
+
+        foreach ($links as $link) {
+            if ($link['type'] === 'Interno') {
+                $internos++;
+            } else {
+                $externos++;
+            }
+
+            if ($link['rel'] === 'Dofollow') {
+                $dofollow++;
+            } else {
+                $nofollow++;
+            }
+        }
+
+        return array(
+            'internos' => $internos,
+            'externos' => $externos,
+            'dofollow' => $dofollow,
+            'nofollow' => $nofollow,
+        );
     }
 }
